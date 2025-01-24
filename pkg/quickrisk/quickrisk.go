@@ -17,10 +17,16 @@ type Component struct {
 	Deps   []string         `yaml:"deps"`
 	Trusts []string         `yaml:"trusts"`
 	Has    []string         `yaml:"has"`
+	Zone   string           `yaml:"zone"`
+}
+
+type Defaults struct {
+	Component Component `yaml:"component"`
+	Risk      *Risk     `yaml:"risk"`
 }
 
 // Config represents the overall YAML structure
 type Config struct {
 	Components map[string]*Component `yaml:"components"`
-	Default    *Risk                 `yaml:"default"`
+	Defaults   Defaults              `yaml:"defaults"`
 }

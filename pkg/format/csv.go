@@ -16,7 +16,7 @@ func CSV(w io.Writer, config quickrisk.Config) {
 	defer writer.Flush()
 
 	// Write CSV header
-	err := writer.Write([]string{"Mitigated Risk Score", "Component", "Risk Name", "Has", "Unmitigated Risk Score", "Mitigations", "Impact", "Likelihood"})
+	err := writer.Write([]string{"Mitigated Risk Score", "Zone", "Component", "Risk Name", "Has", "Unmitigated Risk Score", "Mitigations", "Impact", "Likelihood"})
 	if err != nil {
 		log.Fatalf("Failed to write CSV header: %v", err)
 	}
@@ -39,7 +39,7 @@ func CSV(w io.Writer, config quickrisk.Config) {
 			}
 			sort.Strings(hs)
 
-			row := []string{fmt.Sprintf("%d", r.Score), name, riskName, strings.Join(hs, ", "), fmt.Sprintf("%d", r.UnmitigatedScore), strings.Join(ms, ", "), fmt.Sprintf("%d", r.Impact), fmt.Sprintf("%d", r.Likelihood)}
+			row := []string{fmt.Sprintf("%d", r.Score), c.Zone, name, riskName, strings.Join(hs, ", "), fmt.Sprintf("%d", r.UnmitigatedScore), strings.Join(ms, ", "), fmt.Sprintf("%d", r.Impact), fmt.Sprintf("%d", r.Likelihood)}
 			err = writer.Write(row)
 			if err != nil {
 				log.Fatalf("Failed to write CSV row: %v", err)
