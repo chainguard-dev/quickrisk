@@ -37,6 +37,14 @@ func main() {
 		log.Fatalf("Load failed: %v", err)
 	}
 
+	errs := quickrisk.Validate(c)
+	if len(errs) > 0 {
+		log.Printf("validation failed:")
+		for _, e := range errs {
+			log.Printf("* %s", e)
+		}
+	}
+
 	// Handle the output format
 	switch *formatFlag {
 	case "csv":

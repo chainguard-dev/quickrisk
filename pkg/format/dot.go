@@ -9,14 +9,20 @@ import (
 
 func DOT(w io.Writer, config quickrisk.Config) {
 	fmt.Fprintln(w, "digraph Components {")
-
+	fmt.Fprintln(w, "  nodesep=10;")
 	// Map to group components by zones
 	zones := make(map[string][]string)
 
 	for componentName, component := range config.Components {
 		// Determine node color based on risk
 		highRisk := false
+		critRisk := false
+
 		for _, risk := range component.Risks {
+			if risk != nil && risk.Score >= 4 {
+				critRisk = true
+				break
+			}
 			if risk != nil && risk.Score >= 3 {
 				highRisk = true
 				break
@@ -24,6 +30,9 @@ func DOT(w io.Writer, config quickrisk.Config) {
 		}
 		color := "black"
 		if highRisk {
+			color = "yellow"
+		}
+		if critRisk {
 			color = "red"
 		}
 
@@ -42,7 +51,7 @@ func DOT(w io.Writer, config quickrisk.Config) {
 
 		// Print trust relationships as blue dotted edges
 		for _, t := range component.Trusts {
-			fmt.Fprintf(w, "\t\"%s\" <- \"%s\" [style=dotted, color=blue];\n", t, componentName)
+			fmt.Fprintf(w, "\t\"%s\" -> \"%s\" [style=dotted, color=blue];\n", componentName, t)
 		}
 	}
 

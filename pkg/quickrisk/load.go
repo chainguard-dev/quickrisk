@@ -5,10 +5,35 @@ import (
 	"io/fs"
 	"io/ioutil"
 	"log"
+	"math"
 	"path/filepath"
 
 	"gopkg.in/yaml.v3"
 )
+
+func Validate(c Config) []error {
+	errs := []error{}
+
+	found := map[string]*Component{}
+	for k, v := range c.Components {
+		found[k] = v
+	}
+
+	for k, v := range c.Components {
+		for _, d := range v.Deps {
+			if found[d] == nil {
+				errs = append(errs, fmt.Errorf("component %q references unknown dependency %q", k, d))
+			}
+		}
+		for _, d := range v.Trusts {
+			if found[d] == nil {
+				errs = append(errs, fmt.Errorf("component %q trusts unknown dependency %q", k, d))
+			}
+		}
+
+	}
+	return errs
+}
 
 func LoadConfigs(paths []string) (Config, error) {
 	c := Config{
@@ -107,7 +132,7 @@ func applyDefaultRiskValues(risk *Risk, defaultRisk *Risk) {
 	if risk.Score == 0 {
 		risk.Score = risk.UnmitigatedScore
 		for _, m := range risk.Mitigations {
-			risk.Score += m
+			risk.Score = int(math.Abs(float64(m))) * -1
 		}
 	}
 }
