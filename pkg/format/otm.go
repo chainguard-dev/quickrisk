@@ -3,8 +3,8 @@ package format
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
-	"os"
 
 	"github.com/chainguard-dev/quickrisk/pkg/quickrisk"
 )
@@ -35,7 +35,7 @@ type OTMRisk struct {
 	Severity string `json:"severity"`
 }
 
-func OTM(config quickrisk.Config) {
+func OTM(w io.Writer, config quickrisk.Config) {
 	otm := OTMOutput{
 		OTMVersion: "1.1",
 		Project: OTMProject{
@@ -72,7 +72,7 @@ func OTM(config quickrisk.Config) {
 		otm.Components = append(otm.Components, otmComponent)
 	}
 
-	encoder := json.NewEncoder(os.Stdout)
+	encoder := json.NewEncoder(w)
 	encoder.SetIndent("", "  ")
 	if err := encoder.Encode(otm); err != nil {
 		log.Fatalf("Failed to write OTM output: %v", err)

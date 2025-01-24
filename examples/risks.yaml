@@ -1,0 +1,31 @@
+# Example of kinds of risks you may want to mention for a component
+Access logic failure:
+Access misconfiguration:
+Account takeover:
+Account termination:
+Brute force:
+Command injection:
+Container breakout:
+Cryptocurrency mining:
+Cryptographic failures:
+DDoS:
+Data leak:
+Data loss:
+Data tampering:
+Financial manipulation:
+Impersonation:
+Insecure design:
+Malicious change:
+Malware:
+OAuth application exposure:
+Outage:
+Over-provisioned service account:
+Product cancellation:
+Ransomware:
+SQL injection:
+Social engineering:
+Supply-chain attack:
+Vandalism:
+Vendor compromise:
+Vulnerable outdated component:
+XSS:

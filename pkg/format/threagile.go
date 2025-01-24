@@ -3,8 +3,8 @@ package format
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
-	"os"
 
 	"github.com/chainguard-dev/quickrisk/pkg/quickrisk"
 )
@@ -22,7 +22,7 @@ type ThreagileAsset struct {
 	RiskLevels []string `json:"risk-levels"`
 }
 
-func Threagile(config quickrisk.Config) {
+func Threagile(w io.Writer, config quickrisk.Config) {
 	threagile := ThreagileOutput{
 		Title:       "Generated Threat Model",
 		Description: "This threat model is generated from YAML configuration",
@@ -50,7 +50,7 @@ func Threagile(config quickrisk.Config) {
 		threagile.Assets[componentName] = asset
 	}
 
-	encoder := json.NewEncoder(os.Stdout)
+	encoder := json.NewEncoder(w)
 	encoder.SetIndent("", "  ")
 	if err := encoder.Encode(threagile); err != nil {
 		log.Fatalf("Failed to write Threagile output: %v", err)

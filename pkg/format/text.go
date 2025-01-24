@@ -2,41 +2,51 @@ package format
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/chainguard-dev/quickrisk/pkg/quickrisk"
 )
 
-func Text(config quickrisk.Config) {
+func Text(w io.Writer, config quickrisk.Config) {
 	// Calculate risk scores and print the parsed data
-	for componentName, component := range config.Components {
-		fmt.Printf("Component: %s\n", componentName)
+	for name, c := range config.Components {
+		fmt.Fprintf(w, "[%s]\n", name)
 
-		if component == nil {
-			fmt.Println("  No risks.")
+		if c == nil {
+			fmt.Println("  No data.")
 			continue
 		}
 
-		// Print risks
-		fmt.Println("  Risks:")
-		for riskName, risk := range component.Risks {
-			fmt.Printf("    %s:\n", riskName)
-			if risk != nil {
-				fmt.Printf("      Impact: %d\n", risk.Impact)
-				fmt.Printf("      Likelihood: %d\n", risk.Likelihood)
-				fmt.Printf("      Risk Score: %d\n", risk.Score)
-				if len(risk.Mitigations) > 0 {
-					fmt.Println("      Mitigations:")
-					for mitigation, value := range risk.Mitigations {
-						fmt.Printf("        %s: %d\n", mitigation, value)
+		if len(c.Has) > 0 {
+			fmt.Fprintln(w, "  has:")
+			for _, v := range c.Has {
+				fmt.Fprintf(w, "    -  %s\n", v)
+			}
+		}
+
+		if len(c.Deps) > 0 {
+			fmt.Fprintln(w, "  dependencies:")
+			for _, dep := range c.Deps {
+				fmt.Fprintf(w, "    - %s\n", dep)
+			}
+		}
+
+		fmt.Fprintln(w, "  risks:")
+		for riskName, r := range c.Risks {
+			fmt.Fprintf(w, "    %s:\n", riskName)
+			if r != nil {
+				fmt.Fprintf(w, "      impact: %d\n", r.Impact)
+				fmt.Fprintf(w, "      likelihood: %d\n", r.Likelihood)
+				fmt.Fprintf(w, "      risk score: %d\n", r.Score)
+				if len(r.Mitigations) > 0 {
+					fmt.Fprintln(w, "      mitigations:")
+					for k, v := range r.Mitigations {
+						fmt.Fprintf(w, "        %s: %d\n", k, v)
 					}
 				}
 			}
 		}
 
-		// Print dependencies
-		fmt.Println("  Dependencies:")
-		for _, dep := range component.Deps {
-			fmt.Printf("    - %s\n", dep)
-		}
+		fmt.Fprintln(w, "")
 	}
 }

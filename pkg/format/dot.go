@@ -2,12 +2,13 @@ package format
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/chainguard-dev/quickrisk/pkg/quickrisk"
 )
 
-func DOT(config quickrisk.Config) {
-	fmt.Println("digraph Components {")
+func DOT(w io.Writer, config quickrisk.Config) {
+	fmt.Fprintln(w, "digraph Components {")
 
 	for componentName, component := range config.Components {
 		// Determine node color based on risk
@@ -24,13 +25,13 @@ func DOT(config quickrisk.Config) {
 		if highRisk {
 			color = "red"
 		}
-		fmt.Printf("\t\"%s\" [color=%s];\n", componentName, color)
+		fmt.Fprintf(w, "\t\"%s\" [color=%s];\n", componentName, color)
 
 		// Print dependencies as edges
 		for _, dep := range component.Deps {
-			fmt.Printf("\t\"%s\" -> \"%s\";\n", componentName, dep)
+			fmt.Fprintf(w, "\t\"%s\" -> \"%s\";\n", componentName, dep)
 		}
 	}
 
-	fmt.Println("}")
+	fmt.Fprintln(w, "}")
 }

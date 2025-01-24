@@ -36,13 +36,13 @@ func LoadConfigs(paths []string) (Config, error) {
 			var this Config
 			err = yaml.Unmarshal(data, &this)
 			if err != nil {
-				return err
+				return fmt.Errorf("unmarshal %s: %w", path, err)
 			}
 
 			// TODO: consider edge cases when merging components
 			for k, v := range this.Components {
 				if c.Components[k] != nil {
-					return fmt.Errorf("duplicate key: %s", k)
+					return fmt.Errorf("%s: duplicate key: %s", path, k)
 				}
 
 				if v == nil {
@@ -52,8 +52,14 @@ func LoadConfigs(paths []string) (Config, error) {
 					if r == nil {
 						r = &Risk{}
 					}
+					if r.UnmitigatedScore == 0 {
+						r.UnmitigatedScore = (r.Impact - 2) + (r.Likelihood - 2)
+					}
 					if r.Score == 0 {
-						r.Score = (r.Impact - 2) + (r.Likelihood - 2)
+						r.Score = r.UnmitigatedScore
+						for _, m := range r.Mitigations {
+							r.Score += m
+						}
 					}
 				}
 
