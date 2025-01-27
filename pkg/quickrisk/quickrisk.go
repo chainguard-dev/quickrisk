@@ -13,11 +13,12 @@ type Risk struct {
 
 // Component represents a single component's configuration
 type Component struct {
-	Risks  map[string]*Risk `yaml:"risks"`
-	Deps   []string         `yaml:"deps"`
-	Trusts []string         `yaml:"trusts"`
-	Has    []string         `yaml:"has"`
-	Zone   string           `yaml:"zone"`
+	Risks    map[string]*Risk `yaml:"risks"`
+	Deps     []string         `yaml:"deps"`
+	Trusts   []string         `yaml:"trusts"`
+	Has      []string         `yaml:"has"`
+	Zone     string           `yaml:"zone"`
+	ZoneDeps []string         `yaml:"zone-deps"`
 }
 
 type Defaults struct {
@@ -29,4 +30,7 @@ type Defaults struct {
 type Config struct {
 	Components map[string]*Component `yaml:"components"`
 	Defaults   Defaults              `yaml:"defaults"`
+
+	// Graph layout
+	Layout string
 }

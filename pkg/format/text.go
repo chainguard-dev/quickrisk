@@ -31,6 +31,17 @@ func Text(w io.Writer, config quickrisk.Config) {
 			}
 		}
 
+		if c.Zone != "" {
+			fmt.Fprintf(w, "  zone: %s\n", c.Zone)
+		}
+
+		if len(c.ZoneDeps) > 0 {
+			fmt.Fprintln(w, "  zone dependencies:")
+			for _, dep := range c.ZoneDeps {
+				fmt.Fprintf(w, "    - %s\n", dep)
+			}
+		}
+
 		fmt.Fprintln(w, "  risks:")
 		for riskName, r := range c.Risks {
 			fmt.Fprintf(w, "    %s:\n", riskName)

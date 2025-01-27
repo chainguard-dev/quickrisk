@@ -3,13 +3,23 @@ package format
 import (
 	"fmt"
 	"io"
+	"regexp"
+	"strings"
 
 	"github.com/chainguard-dev/quickrisk/pkg/quickrisk"
 )
 
+var (
+	nonWordRe = regexp.MustCompile(`\W+`)
+)
+
 func DOT(w io.Writer, config quickrisk.Config) {
 	fmt.Fprintln(w, "digraph Components {")
-	fmt.Fprintln(w, "  nodesep=10;")
+	fmt.Fprintln(w, "  compound=true;")
+
+	fmt.Fprintln(w, "  graph [fontsize=10 fontname=\"Verdana\" compound=true];")
+	fmt.Fprintln(w, "  node [shape=record fontsize=10 fontname=\"Verdana\"];")
+
 	// Map to group components by zones
 	zones := make(map[string][]string)
 
@@ -49,23 +59,34 @@ func DOT(w io.Writer, config quickrisk.Config) {
 			fmt.Fprintf(w, "\t\"%s\" -> \"%s\";\n", componentName, dep)
 		}
 
-		// Print trust relationships as blue dotted edges
-		for _, t := range component.Trusts {
-			fmt.Fprintf(w, "\t\"%s\" -> \"%s\" [style=dotted, color=blue];\n", componentName, t)
+		for _, dep := range component.ZoneDeps {
+			// TODO: fix hardcoding
+			target := "auth.google.com"
+			fmt.Fprintf(w, "\t\"%s\" -> \"%s\" [ltail=\"%s\" lhead=\"%s\"];\n", componentName, target, zoneGraphCluster(component.Zone), zoneGraphCluster(dep))
 		}
+
+		// Print trust relationships as blue dotted edges
+		// for _, t := range component.Trusts {
+		// 	fmt.Fprintf(w, "\t\"%s\" -> \"%s\" [style=dotted, color=blue];\n", componentName, t)
+		// }
 	}
 
 	// Print zones as subgraphs
-	for zoneName, components := range zones {
-		fmt.Fprintf(w, "\tsubgraph \"cluster_%s\" {\n", zoneName)
-		fmt.Fprintln(w, "\t\tstyle=dashed;")
-		fmt.Fprintln(w, "\t\tcolor=gray50;")
-		fmt.Fprintf(w, "\t\tlabel=\"%s\";\n", zoneName)
+	for zone, components := range zones {
+		fmt.Fprintf(w, "\tsubgraph \"%s\" {\n", zoneGraphCluster(zone))
+		// 		fmt.Fprintln(w, "\t\tnode [style=filled];")
+		fmt.Fprintf(w, "\t\tlabel=\"%s\";\n", zone)
 		for _, comp := range components {
-			fmt.Fprintln(w, comp)
+			fmt.Fprintf(w, "\t%s\n", comp)
 		}
+		fmt.Fprintf(w, "\t\tcolor=blue;\n")
 		fmt.Fprintln(w, "\t}")
 	}
 
 	fmt.Fprintln(w, "}")
+}
+
+func zoneGraphCluster(s string) string {
+	s = strings.ToLower(nonWordRe.ReplaceAllString(s, "_"))
+	return fmt.Sprintf("cluster_%s", s)
 }

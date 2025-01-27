@@ -29,7 +29,7 @@ func PNG(w io.Writer, cfg quickrisk.Config) error {
 	}
 
 	// Run the Graphviz command to generate the PNG file
-	cmd := exec.Command("dot", "-Tpng", tmpDOT.Name())
+	cmd := exec.Command("dot", "-Tpng", fmt.Sprintf("-K%s", cfg.Layout), tmpDOT.Name())
 	cmd.Stdout = w         // Pipe output directly to the provided writer
 	cmd.Stderr = os.Stderr // Redirect errors to standard error for debugging
 

@@ -19,10 +19,20 @@ func Validate(c Config) []error {
 		found[k] = v
 	}
 
+	foundZone := map[string]bool{}
+	for _, v := range c.Components {
+		foundZone[v.Zone] = true
+	}
+
 	for k, v := range c.Components {
 		for _, d := range v.Deps {
 			if found[d] == nil {
 				errs = append(errs, fmt.Errorf("component %q references unknown dependency %q", k, d))
+			}
+		}
+		for _, d := range v.ZoneDeps {
+			if !foundZone[d] {
+				errs = append(errs, fmt.Errorf("component %q references unknown zone dependency %q", k, d))
 			}
 		}
 		for _, d := range v.Trusts {
@@ -98,6 +108,10 @@ func applyDefaultComponentValues(comp *Component, defaultComp *Component) {
 	if comp.Zone == "" && defaultComp.Zone != "" {
 		comp.Zone = defaultComp.Zone
 	}
+	if len(comp.ZoneDeps) == 0 {
+		comp.ZoneDeps = append(comp.ZoneDeps, defaultComp.ZoneDeps...)
+	}
+
 	if len(comp.Deps) == 0 {
 		comp.Deps = append(comp.Deps, defaultComp.Deps...)
 	}

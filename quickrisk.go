@@ -12,6 +12,7 @@ import (
 func main() {
 	formatFlag := flag.String("format", "text", "Output format (csv, dot, otm [EXPERIMENTAL], threagile [EXPERIMENTAL])")
 	outputFlag := flag.String("output", "", "Output file (default: stdout)")
+	layoutFlag := flag.String("layout", "dot", "Graphviz layout type to use (default: fdp)")
 	flag.Parse()
 
 	if flag.NArg() < 1 {
@@ -44,6 +45,8 @@ func main() {
 			log.Printf("* %s", e)
 		}
 	}
+
+	c.Layout = *layoutFlag
 
 	// Handle the output format
 	switch *formatFlag {
