@@ -146,7 +146,7 @@ func applyDefaultRiskValues(risk *Risk, defaultRisk *Risk) {
 	if risk.Score == 0 {
 		risk.Score = risk.UnmitigatedScore
 		for _, m := range risk.Mitigations {
-			risk.Score = int(math.Abs(float64(m))) * -1
+			risk.Score = risk.Score + (int(math.Abs(float64(m))) * -1)
 		}
 	}
 }
